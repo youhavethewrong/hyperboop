@@ -1,6 +1,6 @@
 extern crate hyper;
 
-use hyper::{Body, Response, Server};
+use hyper::{Body, Method, Response, Server};
 use hyper::rt::Future;
 use hyper::service::service_fn_ok;
 
@@ -27,8 +27,14 @@ fn main() {
 
     println!("Listening on localhost:3000.");
     let new_svc = || {
-        service_fn_ok(|_req|{
-            Response::new(Body::from(TEXT))
+        service_fn_ok(|req|{
+            println!("{:?}", req);
+            match req.method() {
+                &Method::GET => Response::new(Body::from(TEXT)),
+                &Method::POST => Response::new(Body::from(format!("{}", square_root(17)))),
+                _ => Response::new(Body::from("WTF is that supposed to be?"))
+            }
+
         })
     };
 
